@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Fake Product Identification</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Fonts and CSS -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+      body {
+        background-color: #121212;
+        color: #ffffff;
+      }
+
+      h2, label, th {
+        color: #ffffff;
+      }
+
+      .navbar, .ftco_navbar {
+        background-color: #1f1f1f !important;
+      }
+
+      .navbar-brand, .nav-link {
+        color: #ffffff !important;
+      }
+
+      .form-control {
+        background-color: #2c2c2c;
+        border: 1px solid #ff4c4c;
+        color: #ffffff;
+      }
+
+      .btn-warning {
+        background-color: #ff4c4c;
+        border: none;
+        color: white;
+      }
+
+      .btn-warning:hover {
+        background-color: #e63c3c;
+      }
+
+      table.table {
+        background-color: #2c2c2c;
+        color: #ffffff;
+      }
+
+      #qr-reader {
+        border: 1px solid #ff4c4c;
+        border-radius: 8px;
+        padding: 8px;
+        background-color: #1f1f1f;
+      }
+
+      #qr-reader-results {
+        color: #ffffff;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+
+      #add {
+        color: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="ftco-section">
+      <div class="container-fluid px-md-5">
+        <div class="row justify-content-between">
+          <div class="col-md-8 order-md-last">
+            <div class="row">
+              <div class="col-md-6 text-center">
+                <a class="navbar-brand" href="index.html">Fake Product Identification <span>through Blockchain</span></a>
+              </div>
+              <div class="col-md-6 d-md-flex justify-content-end mb-md-0 mb-3">
+                <form action="#" class="searchform order-lg-last"></form>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 d-flex">
+            <div class="social-media"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar" id="ftco-navbar">
+        <div class="container-fluid">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav">
+            <span class="fa fa-bars"></span> Menu
+          </button>
+          <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav m-auto">
+              <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+              <li class="nav-item"><a href="manufacturer.html" class="nav-link">Manufacturer</a></li>
+              <li class="nav-item"><a href="seller.html" class="nav-link">Seller</a></li>
+              <li class="nav-item"><a href="consumer.html" class="nav-link">Consumer</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Verify Products</h2>
+        <div class="container-fluid">
+          <center>
+            <div id="qr-reader" style="width:300px"></div>
+            <div id="qr-reader-results"></div>
+          </center>
+        </div>
+
+        <div class="form-group mt-4">
+          <label for="productSN">Product SN:</label>
+          <input disabled type="text" class="form-control" id="productSN" placeholder="Enter Product SN" name="productSN">
+          
+          <label for="consumerCode">Consumer Code</label>
+          <input type="text" class="form-control" id="consumerCode" placeholder="Enter Consumer Code" name="consumerCode">
+        </div>
+
+        <button type="submit" class="btn btn-warning btn-register" id="register">Get Product Status</button>
+      </div>
+    </section>
+
+    <br/>
+    <section>
+      <div class="container">
+        <h2>Is the product sold to consumer fake or not?</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product Verification Result</th>
+            </tr>
+          </thead>
+          <tbody id="logdata"></tbody>
+        </table>
+        <center><p>Your address is <b id="add"></b></p></center>
+      </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script src="js/truffle-contract.js"></script>
+    <script src="js/verifyProduct.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <!-- QR Scanner Logic -->
+    <script>
+      var decodedText = "Enter Product SN";
+
+      function docReady(fn) {
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+          setTimeout(fn, 1);
+        } else {
+          document.addEventListener("DOMContentLoaded", fn);
+        }
+      }
+
+      docReady(function () {
+        var resultContainer = document.getElementById('qr-reader-results');
+        var lastResult, countResults = 0;
+
+        function onScanSuccess(decodedText, decodedResult) {
+          if (decodedText !== lastResult) {
+            ++countResults;
+            lastResult = decodedText;
+            var audio = new Audio('beep.wav');
+            audio.play();
+            document.getElementById('qr-reader-results').innerHTML = decodedText;
+            document.getElementById("productSN").value = decodedText;
+          }
+        }
+
+        var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", {
+          fps: 10,
+          qrbox: 250
+        });
+        html5QrcodeScanner.render(onScanSuccess);
+      });
+    </script>
+  </body>
+</html>
