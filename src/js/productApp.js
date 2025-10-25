@@ -37,7 +37,7 @@ App = {
     initContract: async function() {
         try {
             // Load contract data
-            const response = await fetch('product.json');
+            const response = await fetch('contracts/product.json');
             const productArtifact = await response.json();
             
             App.contracts.product = TruffleContract(productArtifact);

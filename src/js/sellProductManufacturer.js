@@ -20,7 +20,7 @@ App = {
 
     initContract: function() {
 
-        $.getJSON('product.json',function(data){
+        $.getJSON('../../client/src/contracts/product.json',function(data){
 
             var productArtifact=data;
             App.contracts.product=TruffleContract(productArtifact);

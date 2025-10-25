@@ -20,7 +20,7 @@ App = {
 
     initContract: function() {
 
-        $.getJSON('product.json',function(data){
+        $.getJSON('../../client/src/contracts/product.json',function(data){
 
             var productArtifact=data;
             App.contracts.product=TruffleContract(productArtifact);
@@ -52,15 +52,15 @@ App = {
 
             console.log(accounts);
             var account=accounts[0];
-            // console.log(account);
+            console.log({account});
 
             App.contracts.product.deployed().then(function(instance){
                 productInstance=instance;
+                console.log("here")
                 return productInstance.sellerSellProduct(web3.fromAscii(productSN),web3.fromAscii(consumerCode), {from:account});
              }).then(function(result){
-                // console.log(result);
-                window.location.reload();
-                document.getElementById('sellerName').innerHTML='';
+                console.log(result);
+                                document.getElementById('sellerName').innerHTML='';
                 document.getElementById('sellerBrand').innerHTML='';
 
             }).catch(function(err){
